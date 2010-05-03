@@ -108,4 +108,4 @@ class Histogram:
 
             bar = graph + (' ' * (bar_width-len(graph)))
 
-            fd.write("%-6d %s (%.1f%%)\n" % (bucket, bar, pct))
+            fd.write("%-6d %s (%d = %.1f%%)\n" % (bucket, bar, bucket_stats["count"], pct))
