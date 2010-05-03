@@ -1,0 +1,5 @@
+*.pyc
+build
+dist
+instatrace.egg-info
+setuptools*.egg
