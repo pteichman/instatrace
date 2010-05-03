@@ -18,8 +18,11 @@ class Histogram:
         self._buckets = {}
 
     def _get_bucket(self, sample):
-        # use exponential buckets
-        bucket = math.floor(math.exp(math.floor(math.log(sample))))
+        if sample == 0:
+            bucket = 0
+        else:
+            # use exponential buckets
+            bucket = math.floor(math.exp(math.floor(math.log(sample))))
 
         return self._buckets.setdefault(bucket, [])
 
