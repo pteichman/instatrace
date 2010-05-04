@@ -36,7 +36,8 @@ class HistogramsCommand:
                 line = line.strip()
 
                 stat = line.split(" ", 2)
-                stats.add_sample(stat[0], int(stat[1]))
+                if len(stat) >= 2:
+                    stats.add_sample(stat[0], int(stat[1]))
 
             fd.close()
 
