@@ -104,7 +104,7 @@ class Histogram:
         for bucket, bucket_stats in stats["buckets"]:
             pct = float(bucket_stats["count"]) / stats["count"] * 100
 
-            graph = '=' * int(bar_width * pct/100) + "O"
+            graph = '-' * int(bar_width * pct/100) + "O"
 
             bar = graph + (' ' * (bar_width-len(graph)))
 
