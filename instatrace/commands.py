@@ -13,8 +13,11 @@ class HistogramsCommand:
     @classmethod
     def add_subparser(cls, parser):
         subparser = parser.add_parser("histograms", help="Stat histograms")
+        subparser.add_argument("--filter", action="store_true",
+                               help="Filter out any lines that don't contain INSTATRACE")
         subparser.add_argument("file", nargs="+")
-        subparser.set_defaults(run=cls.run)
+        subparser.set_defaults(run=cls.run,
+                               filter_marker="INSTATRACE: ")
 
     @staticmethod
     def run(args):
@@ -24,6 +27,12 @@ class HistogramsCommand:
             count = 0
             fd = open(filename)
             for line in fd.xreadlines():
+                if args.filter:
+                    pos = line.find(args.filter_marker)
+                    if pos == -1:
+                        continue
+                    line = line[pos+len(args.filter_marker):]
+
                 line = line.strip()
 
                 stat = line.split(" ", 2)
