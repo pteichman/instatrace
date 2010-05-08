@@ -15,12 +15,15 @@ class HistogramsCommand:
         subparser = parser.add_parser("histograms", help="Stat histograms")
         subparser.add_argument("--filter", action="store_true",
                                help="Filter out any lines that don't contain INSTATRACE")
+        subparser.add_argument("-s", "--stat", action="append",
+                               dest="show_stats", metavar="STAT",
+                               help="Ignore stats not matching STAT")
         subparser.add_argument("file", nargs="+")
         subparser.set_defaults(run=cls.run,
                                filter_marker="INSTATRACE: ")
 
-    @staticmethod
-    def run(args):
+    @classmethod
+    def run(cls, args):
         stats = Statistics()
 
         for filename in args.file:
@@ -32,6 +35,9 @@ class HistogramsCommand:
                     if pos == -1:
                         continue
                     line = line[pos+len(args.filter_marker):]
+
+                if args.show_stats and not cls._line_matches(line, args.show_stats):
+                    continue
 
                 line = line.strip()
 
@@ -50,3 +56,10 @@ class HistogramsCommand:
 
             if i != len(names)-1:
                 sys.stdout.write("\n")
+
+    @staticmethod
+    def _line_matches(line, stats):
+        for stat in stats:
+            if line.find(stat) != -1:
+                return True
+        return False
