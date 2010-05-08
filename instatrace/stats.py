@@ -100,6 +100,8 @@ class Histogram:
             if bucket_stats["count"] > max_count:
                 max_count = bucket_stats["count"]
 
+        total_pct = 0
+
         for bucket, bucket_stats in stats["buckets"]:
             pct = float(bucket_stats["count"]) / stats["count"] * 100
 
@@ -107,4 +109,10 @@ class Histogram:
 
             bar = graph + (' ' * (bar_width-len(graph)))
 
-            fd.write("%-6d %s (%d = %.1f%%)\n" % (bucket, bar, bucket_stats["count"], pct))
+            percentile = ""
+            if total_pct > 0:
+                percentile = " {%.1f%%}" % total_pct
+
+            total_pct = total_pct + pct
+
+            fd.write("%-6d %s (%d = %.1f%%)%s\n" % (bucket, bar, bucket_stats["count"], pct, percentile))
