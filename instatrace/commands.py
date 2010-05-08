@@ -44,6 +44,9 @@ class HistogramsCommand:
         names = stats.statistics.keys()
         names.sort()
 
-        for name in names:
+        for i, name in enumerate(names):
             histogram = stats.statistics.get(name)
             histogram.text(sys.stdout)
+
+            if i != len(names)-1:
+                sys.stdout.write("\n")

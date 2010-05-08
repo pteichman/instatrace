@@ -91,7 +91,6 @@ class Histogram:
         bar_width = 60
         stats = self.stats()
 
-        fd.write("\n")
         fd.write("Histogram: %s recorded %d samples, avg = %.1f, std = %.1f\n"
                  % (self._name, stats["count"], stats["mean"], stats["stddev"]))
 
