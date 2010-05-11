@@ -17,6 +17,32 @@ class Statistics:
                                                                self.config))
         stat.add_sample(sample)
 
+    def load(self, filename, stat_names=None, filter_with=None):
+        fd = open(filename)
+        for line in fd.xreadlines():
+            if filter_with is not None:
+                pos = line.find(args.filter_with)
+                if pos == -1:
+                    continue
+                line = line[pos+len(args.filter_with):]
+
+            if stat_names and not self._line_matches(line, stat_names):
+                continue
+
+            line = line.strip()
+
+            stat = line.split(" ", 2)
+            if len(stat) >= 2:
+                self.add_sample(stat[0], int(stat[1]))
+
+        fd.close()
+
+    def _line_matches(self, line, stats):
+        for stat in stats:
+            if line.find(stat) != -1:
+                return True
+        return False
+
 class Histogram:
     def __init__(self, name, config):
         self._name = name

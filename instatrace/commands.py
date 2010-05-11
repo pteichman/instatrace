@@ -29,25 +29,11 @@ class HistogramsCommand:
         stats = Statistics(configfile=args.config)
 
         for filename in args.file:
-            count = 0
-            fd = open(filename)
-            for line in fd.xreadlines():
-                if args.filter:
-                    pos = line.find(args.filter_marker)
-                    if pos == -1:
-                        continue
-                    line = line[pos+len(args.filter_marker):]
+            marker = None
+            if args.filter:
+                marker = args.filter_marker
 
-                if args.show_stats and not cls._line_matches(line, args.show_stats):
-                    continue
-
-                line = line.strip()
-
-                stat = line.split(" ", 2)
-                if len(stat) >= 2:
-                    stats.add_sample(stat[0], int(stat[1]))
-
-            fd.close()
+            stats.load(filename, args.show_stats, marker)
 
         names = stats.statistics.keys()
         names.sort()
@@ -59,9 +45,3 @@ class HistogramsCommand:
             if i != len(names)-1:
                 sys.stdout.write("\n")
 
-    @staticmethod
-    def _line_matches(line, stats):
-        for stat in stats:
-            if line.find(stat) != -1:
-                return True
-        return False
