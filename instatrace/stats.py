@@ -1,19 +1,32 @@
 # Copyright (C) 2010 Peter Teichman
 
+from ConfigParser import SafeConfigParser
 import math
 
 class Statistics:
-    def __init__(self):
+    def __init__(self, configfile=None):
         self.statistics = {}
 
+        self.config = SafeConfigParser({"layout": "exp",
+                                        "scale": "1"})
+        if configfile is not None:
+            self.config.read(configfile)
+
     def add_sample(self, stat_name, sample):
-        stat = self.statistics.setdefault(stat_name, Histogram(stat_name))
+        stat = self.statistics.setdefault(stat_name, Histogram(stat_name,
+                                                               self.config))
         stat.add_sample(sample)
 
 class Histogram:
-    def __init__(self, name):
+    def __init__(self, name, config):
         self._name = name
         self._samples = []
+
+        # pull in this Histogram's options from the config file
+        self._options = {}
+        self._options.update(config.defaults())
+        if config.has_section(name):
+            self._options.update(config.items(name))
 
         self._buckets = {}
 
@@ -21,12 +34,19 @@ class Histogram:
         if sample == 0:
             bucket = 0
         else:
-            # use exponential buckets
-            bucket = math.floor(math.exp(math.floor(math.log(sample))))
+            if self._options["layout"] == "linear":
+                bucket = math.floor(sample)
+            else:
+                # use exponential buckets
+                bucket = math.floor(math.exp(math.floor(math.log(sample))))
 
         return self._buckets.setdefault(bucket, [])
 
     def add_sample(self, sample):
+        scale = self._options.get("scale")
+        if scale is not None:
+            sample = sample / int(scale)
+
         bucket = self._get_bucket(sample)
         bucket.append(sample)
 

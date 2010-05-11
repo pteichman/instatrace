@@ -13,6 +13,8 @@ class HistogramsCommand:
     @classmethod
     def add_subparser(cls, parser):
         subparser = parser.add_parser("histograms", help="Stat histograms")
+        subparser.add_argument("-c", "--config",
+                               help="Statistics configuration file")
         subparser.add_argument("--filter", action="store_true",
                                help="Filter out any lines that don't contain INSTATRACE")
         subparser.add_argument("-s", "--stat", action="append",
@@ -24,7 +26,7 @@ class HistogramsCommand:
 
     @classmethod
     def run(cls, args):
-        stats = Statistics()
+        stats = Statistics(configfile=args.config)
 
         for filename in args.file:
             count = 0
