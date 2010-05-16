@@ -7,7 +7,6 @@ import sys
 from . import commands
 
 parser = argparse.ArgumentParser(description="Instastat control")
-parser.add_argument("-s", "--stats", default="insta.stats")
 parser.add_argument("--debug", action="store_true", help=argparse.SUPPRESS)
 
 subparsers = parser.add_subparsers(title="Commands")
