@@ -12,7 +12,7 @@ setup(
     url = "http://wiki.github.com/pteichman/instatrace/",
     description = "Software statistics recorder/display",
     packages = ["instatrace"],
-    test_suite = "tests.suite",
+    test_suite = "tests",
     install_requires = ["argparse>=1.1"],
     classifiers = [
         "Development Status :: 5 - Production/Stable",
