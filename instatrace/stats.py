@@ -1,7 +1,10 @@
 # Copyright (C) 2010 Peter Teichman
 
 from ConfigParser import SafeConfigParser
+import logging
 import math
+
+_log = logging.getLogger("instatrace")
 
 class Statistics:
     def __init__(self, configfile=None):
@@ -33,7 +36,11 @@ class Statistics:
 
             stat = line.split(" ", 2)
             if len(stat) >= 2:
-                self.add_sample(stat[0], int(stat[1]))
+                try:
+                    self.add_sample(stat[0], int(stat[1]))
+                except ValueError:
+                    _log.warn("skipped bad trace value (non-integer?): %s %s",
+                              stat[0], stat[1])
 
         fd.close()
 
