@@ -44,4 +44,3 @@ class HistogramsCommand:
 
             if i != len(names)-1:
                 sys.stdout.write("\n")
-
