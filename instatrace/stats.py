@@ -21,27 +21,40 @@ class Accumulator:
         json.dump(self.statistics, fd)
         fd.write("\n")
 
+    def _load_dump_v1(self, fd):
+        self.statistics = json.load(fd)
+
     def load(self, filename, stat_names=None, filter_with=None):
         fd = open(filename)
-        for line in fd.xreadlines():
-            if filter_with is not None:
-                pos = line.find(filter_with)
-                if pos == -1:
+
+        magic = fd.read(len(DUMP_MAGIC_HEADER))
+        if magic == DUMP_MAGIC_HEADER:
+            ver = fd.read(1)
+            if ver == "1":
+                return self._load_dump_v1(fd)
+        else:
+            # rewind back to the first line
+            fd.seek(0)
+
+            for line in fd.xreadlines():
+                if filter_with is not None:
+                    pos = line.find(filter_with)
+                    if pos == -1:
+                        continue
+                    line = line[pos+len(filter_with):]
+
+                if stat_names and not self._line_matches(line, stat_names):
                     continue
-                line = line[pos+len(filter_with):]
 
-            if stat_names and not self._line_matches(line, stat_names):
-                continue
+                line = line.strip()
 
-            line = line.strip()
-
-            stat = line.split(" ", 2)
-            if len(stat) >= 2:
-                try:
-                    self.add_sample(stat[0], int(stat[1]))
-                except ValueError:
-                    _log.warn("skipped bad trace value (non-integer?): %s %s",
-                              stat[0], stat[1])
+                stat = line.split(" ", 2)
+                if len(stat) >= 2:
+                    try:
+                        self.add_sample(stat[0], int(stat[1]))
+                    except ValueError:
+                        _log.warn("skipped bad trace value (non-integer?): %s %s",
+                                  stat[0], stat[1])
 
         fd.close()
 
