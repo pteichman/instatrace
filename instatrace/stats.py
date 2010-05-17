@@ -1,24 +1,17 @@
 # Copyright (C) 2010 Peter Teichman
 
-from ConfigParser import SafeConfigParser
 import logging
 import math
 
 _log = logging.getLogger("instatrace")
 
-class Statistics:
+class Accumulator:
     def __init__(self, configfile=None):
         self.statistics = {}
 
-        self.config = SafeConfigParser({"layout": "exp",
-                                        "scale": "1"})
-        if configfile is not None:
-            self.config.read(configfile)
-
     def add_sample(self, stat_name, sample):
-        stat = self.statistics.setdefault(stat_name, Histogram(stat_name,
-                                                               self.config))
-        stat.add_sample(sample)
+        stat = self.statistics.setdefault(stat_name, [])
+        stat.append(sample)
 
     def load(self, filename, stat_names=None, filter_with=None):
         fd = open(filename)
@@ -50,10 +43,10 @@ class Statistics:
                 return True
         return False
 
-class Histogram:
-    def __init__(self, name, config):
+class Statistic:
+    def __init__(self, name, samples, config):
         self._name = name
-        self._samples = []
+        self._samples = samples
 
         # pull in this Histogram's options from the config file
         self._options = {}
@@ -62,6 +55,10 @@ class Histogram:
             self._options.update(config.items(name))
 
         self._buckets = {}
+
+        # load our samples
+        for sample in self._samples:
+            self.add_sample(sample)
 
     def _get_bucket(self, sample):
         if sample == 0:
@@ -140,7 +137,7 @@ class Histogram:
 
         return stats
 
-    def text(self, fd):
+    def write_text_histogram(self, fd):
         bar_width = 60
         stats = self.stats()
 

@@ -1,11 +1,13 @@
 # Copyright (C) 2010 Peter Teichman
 
+from ConfigParser import SafeConfigParser
 import logging
 import os
+import simplejson as json
 import sys
 import time
 
-from .stats import Histogram, Statistics
+from .stats import Accumulator, Statistic
 
 log = logging.getLogger("instatrace")
 
@@ -26,21 +28,29 @@ class HistogramsCommand:
 
     @classmethod
     def run(cls, args):
-        stats = Statistics(configfile=args.config)
+        stats = Accumulator()
+
+        marker = None
+        if args.filter:
+            marker = args.filter_marker
 
         for filename in args.file:
-            marker = None
-            if args.filter:
-                marker = args.filter_marker
-
             stats.load(filename, args.show_stats, marker)
+
+        # load statistic configuration if requested
+        config = SafeConfigParser({"layout": "exponential",
+                                   "scale": "1"})
+        if args.config is not None:
+            config.read(args.config)
 
         names = stats.statistics.keys()
         names.sort()
 
         for i, name in enumerate(names):
-            histogram = stats.statistics.get(name)
-            histogram.text(sys.stdout)
+            samples = stats.statistics.get(name)
+
+            stat = Statistic(name, samples, config)
+            stat.write_text_histogram(sys.stdout)
 
             if i != len(names)-1:
                 sys.stdout.write("\n")

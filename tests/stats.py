@@ -1,19 +1,28 @@
 # Copyright (C) 2010 Peter Teichman
 
+from ConfigParser import SafeConfigParser
 import unittest
 
-from instatrace.stats import Statistics
+from instatrace.stats import Accumulator, Statistic
 
 class testStatistics(unittest.TestCase):
+    def setUp(self):
+        self.config = SafeConfigParser({"layout": "exponential",
+                                        "scale": "1"})
+
+    def tearDown(self):
+        self.config = None
+
     def testStats(self):
         name = "test_stat"
-        s = Statistics()
+        s = Accumulator()
 
         s.add_sample(name, 1)
         s.add_sample(name, 2)
         s.add_sample(name, 3)
 
-        test_stat = s.statistics.get(name)
+        samples = s.statistics.get(name)
+        test_stat = Statistic(name, samples, self.config)
 
         self.assertEqual(name, test_stat._name)
 
@@ -27,7 +36,7 @@ class testStatistics(unittest.TestCase):
     def testStandardDeviation(self):
         name = "test_stat"
 
-        s = Statistics()
+        s = Accumulator()
 
         s.add_sample(name, 2)
         s.add_sample(name, 4)
@@ -38,7 +47,8 @@ class testStatistics(unittest.TestCase):
         s.add_sample(name, 7)
         s.add_sample(name, 9)
 
-        test_stat = s.statistics.get(name)
+        samples = s.statistics.get(name)
+        test_stat = Statistic(name, samples, self.config)
 
         self.assertEqual(name, test_stat._name)
 
