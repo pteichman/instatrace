@@ -6,7 +6,7 @@ import sys
 
 from . import commands
 
-parser = argparse.ArgumentParser(description="Instastat control")
+parser = argparse.ArgumentParser(description="Instatrace control")
 parser.add_argument("--debug", action="store_true", help=argparse.SUPPRESS)
 
 subparsers = parser.add_subparsers(title="Commands")
