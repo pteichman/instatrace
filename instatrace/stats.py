@@ -24,10 +24,10 @@ class Statistics:
         fd = open(filename)
         for line in fd.xreadlines():
             if filter_with is not None:
-                pos = line.find(args.filter_with)
+                pos = line.find(filter_with)
                 if pos == -1:
                     continue
-                line = line[pos+len(args.filter_with):]
+                line = line[pos+len(filter_with):]
 
             if stat_names and not self._line_matches(line, stat_names):
                 continue
