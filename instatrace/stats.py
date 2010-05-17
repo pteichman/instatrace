@@ -2,8 +2,11 @@
 
 import logging
 import math
+import simplejson as json
 
 _log = logging.getLogger("instatrace")
+
+DUMP_MAGIC_HEADER = "Instatrace:"
 
 class Accumulator:
     def __init__(self, configfile=None):
@@ -12,6 +15,11 @@ class Accumulator:
     def add_sample(self, stat_name, sample):
         stat = self.statistics.setdefault(stat_name, [])
         stat.append(sample)
+
+    def dump(self, fd):
+        fd.write("%s1\n" % DUMP_MAGIC_HEADER)
+        json.dump(self.statistics, fd)
+        fd.write("\n")
 
     def load(self, filename, stat_names=None, filter_with=None):
         fd = open(filename)

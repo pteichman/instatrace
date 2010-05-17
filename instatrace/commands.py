@@ -3,7 +3,6 @@
 from ConfigParser import SafeConfigParser
 import logging
 import os
-import simplejson as json
 import sys
 import time
 
@@ -32,7 +31,7 @@ class ExtractCommand:
         for filename in args.file:
             stats.load(filename, None, marker)
 
-        print json.dumps(stats.statistics)
+        stats.dump(sys.stdout)
 
 class HistogramsCommand:
     @classmethod
