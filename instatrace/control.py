@@ -10,6 +10,7 @@ parser = argparse.ArgumentParser(description="Instatrace control")
 parser.add_argument("--debug", action="store_true", help=argparse.SUPPRESS)
 
 subparsers = parser.add_subparsers(title="Commands")
+commands.ExtractCommand.add_subparser(subparsers)
 commands.HistogramsCommand.add_subparser(subparsers)
 
 def main():

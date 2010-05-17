@@ -11,6 +11,29 @@ from .stats import Accumulator, Statistic
 
 log = logging.getLogger("instatrace")
 
+class ExtractCommand:
+    @classmethod
+    def add_subparser(cls, parser):
+        subparser = parser.add_parser("extract", help="Extract instatrace data from program log files")
+        subparser.add_argument("--filter", action="store_true",
+                               help="Filter out any lines that don't contain INSTATRACE")
+        subparser.add_argument("file", nargs="+")
+        subparser.set_defaults(run=cls.run,
+                               filter_marker="INSTATRACE: ")
+
+    @classmethod
+    def run(cls, args):
+        stats = Accumulator()
+
+        marker = None
+        if args.filter:
+            marker = args.filter_marker
+
+        for filename in args.file:
+            stats.load(filename, None, marker)
+
+        print json.dumps(stats.statistics)
+
 class HistogramsCommand:
     @classmethod
     def add_subparser(cls, parser):
