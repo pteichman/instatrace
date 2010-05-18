@@ -87,9 +87,15 @@ class Statistic:
         else:
             if self._options["layout"] == "linear":
                 bucket = math.floor(sample)
+                next_bucket = math.floor(sample+1)
             else:
                 # use exponential buckets
-                bucket = math.floor(math.exp(math.floor(math.log(sample))))
+                bucket_num = math.floor(math.log(sample))
+
+                bucket = math.floor(math.exp(bucket_num))
+                next_bucket = math.floor(math.exp(bucket_num+1))
+
+            self._buckets.setdefault(next_bucket, [])
 
         return self._buckets.setdefault(bucket, [])
 
@@ -112,13 +118,15 @@ class Statistic:
 
         for bucket_id in buckets:
             samples = self._buckets[bucket_id]
+            if len(samples) == 0:
+                bucket_stats = None
+            else:
+                bucket_stats = self._bucket_stats(samples)
 
-            bucket_stats = self._bucket_stats(samples)
+                count = count + bucket_stats["count"]
+                total = total + bucket_stats["total"]
 
             stats.setdefault("buckets", []).append((bucket_id, bucket_stats))
-
-            count = count + bucket_stats["count"]
-            total = total + bucket_stats["total"]
 
         stats["count"] = count
         stats["total"] = total
@@ -168,12 +176,16 @@ class Statistic:
         # largest sample count of all buckets
         max_count = 0
         for bucket, bucket_stats in stats["buckets"]:
-            if bucket_stats["count"] > max_count:
+            if bucket_stats is not None and bucket_stats["count"] > max_count:
                 max_count = bucket_stats["count"]
 
         total_pct = 0
 
         for bucket, bucket_stats in stats["buckets"]:
+            if bucket_stats is None:
+                fd.write("%-6d ...\n" % bucket)
+                continue
+
             pct = float(bucket_stats["count"]) / stats["count"] * 100
 
             graph = '-' * int(bar_width * pct/100) + "O"
