@@ -192,10 +192,7 @@ class Statistic:
 
             bar = graph + (' ' * (bar_width-len(graph)))
 
-            percentile = ""
-            if total_pct > 0:
-                percentile = " {%.1f%%}" % total_pct
-
             total_pct = total_pct + pct
+            cumulative = " {%.1f%%}" % total_pct
 
-            fd.write("%-6d %s (%d = %.1f%%)%s\n" % (bucket, bar, bucket_stats["count"], pct, percentile))
+            fd.write("%-6d %s (%d = %.1f%%)%s\n" % (bucket, bar, bucket_stats["count"], pct, cumulative))
