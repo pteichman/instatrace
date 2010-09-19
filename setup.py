@@ -7,7 +7,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = "instatrace",
-    version = "1.0.0",
+    version = "1.0.1",
     author = "Peter Teichman",
     author_email = "peter@teichman.org",
     url = "http://wiki.github.com/pteichman/instatrace/",
